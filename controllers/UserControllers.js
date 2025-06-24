@@ -4,7 +4,8 @@ import jwt from 'jsonwebtoken';
 
 export const registerUser = async (req, res) => {
     try {
-        const { username, email, password } = req.body;
+        const { username, email, password,role } = req.body;
+        console.log(username, email, password,role,"username, email, password,role")
         console.log("Incoming:", username, email, password);
 
         const salt = await bcrypt.genSalt(10);
@@ -14,6 +15,7 @@ export const registerUser = async (req, res) => {
             username,
             email,
             password: hashedPassword,
+            role:role?role:'user' 
         });
 
         const savedUser = await newUser.save();
@@ -41,7 +43,7 @@ export const loginUser = async (req, res) => {
     process.env.JWT_SECRET,
     { expiresIn: '15d' } 
 );
-        res.status(200).json({ token, user: { id: user._id, username: user.username, email: user.email } });
+        res.status(200).json({ token, user: { id: user._id, username: user.username, email: user.email,role:user.role } });
     } catch (err) {
         res.status(500).json(err);
     }
