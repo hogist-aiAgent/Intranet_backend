@@ -4,6 +4,8 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const bodyparser = require("body-parser");
 const authRoute=require('./routes/User')
+const attendanceRoutes=require('./routes/attendanceRoutes')
+const staffRoutes =require('./routes/staffRoutes')
 const app = express();
 dotenv.config();
 app.use(cors());
@@ -11,6 +13,8 @@ app.use(express.json());
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use("/api/auth", authRoute);
+app.use('/api/attendance', attendanceRoutes);
+app.use('/api/staff', staffRoutes);
 app.get("/api", (req, res) => {
   res.status(200).json({ message: "API is working fine!" });
 });
