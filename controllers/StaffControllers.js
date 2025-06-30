@@ -14,7 +14,7 @@ exports.createStaff = async (req, res) => {
   }
 };
 
-// Get All
+
 exports.getAllStaff = async (req, res) => {
   try {
     const staff = await Staff.find();
@@ -24,7 +24,7 @@ exports.getAllStaff = async (req, res) => {
   }
 };
 
-// Get By ID
+
 exports.getStaffById = async (req, res) => {
   try {
     const staff = await Staff.findById(req.params.id);
@@ -35,18 +35,21 @@ exports.getStaffById = async (req, res) => {
   }
 };
 
-// Update
+
 exports.updateStaff = async (req, res) => {
   try {
     const updated = await Staff.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!updated) return res.status(404).json({ error: 'Staff not found' });
-    res.json(updated);
+    res.json({
+        "message":"Updated Successfully",
+        "data":updated
+    });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 };
 
-// Delete
+
 exports.deleteStaff = async (req, res) => {
   try {
     const deleted = await Staff.findByIdAndDelete(req.params.id);

@@ -7,14 +7,14 @@ const DailyAttendanceSchema = new mongoose.Schema({
       name: String,
       role: String,
       dept: String,
-      onOffSite: { type: String, enum: ['On Site','Off Site','Both'], default: 'On Site' },
+      onOffSite: { type: String, enum: ['Onsite', 'Offsite', 'Both'], default: 'Onsite' },
       loginTime: String,
       logoutTime: String,
-      status: { type: String, enum: ['Present','Leave','Holiday'], required: true },
+      status: { type: String, enum: ['None','Present','Leave','Holiday'], required: true },
       leaveType: { type: String, enum: ['None','CL','ML','PL','LOP',''], default: '' },
       totalWorkHrs: String,
       workType1: { type: String, enum: ['Regular','Week Off','Comp Off'], required: true },
-      workType2: { type: String, enum: ['Regular','Week Off','Comp Off'], required: true },
+      workType2: { type: String, enum: ['Regular','Week Off','Comp Off'], required: false },
       remarks: { type: String, default: '' },
       isEditing: { type: Boolean, default: false }
     }

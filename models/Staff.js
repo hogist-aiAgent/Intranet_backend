@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const staffSchema = new mongoose.Schema({
+ 
   employeeId: { type: String, required: true, unique: true },
   staffName: String,
   gender: { type: String, enum: ['M', 'F'] },

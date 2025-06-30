@@ -53,9 +53,8 @@ exports.getAttendanceByDate = async (req, res) => {
  console.log(records,"records")
     const today = new Date().toISOString().split('T')[0];
     if (!record && date === today) {
-        start.setHours(0, 0, 0, 0)
+     
       const staffList = await Staff.find({}, 'employeeId staffName role department jobType');
-console.log(staffList,"staffList")
      const attendanceData = staffList.map((emp) => ({
   empCode: emp.employeeId,
   name: emp.staffName,
@@ -64,7 +63,7 @@ console.log(staffList,"staffList")
   onOffSite: emp.jobType ,            
   loginTime: '',
   logoutTime: '',   
-  status: 'Present',               
+  status: 'None',               
   leaveType: 'None',              
   totalWorkHrs: '',
   workType1: 'Regular',            
@@ -72,7 +71,7 @@ console.log(staffList,"staffList")
   remarks: '',
   isEditing: false
 }));
-
+console.log(start,'start')
       record = await DailyAttendance.create({
         date: start,
         attendanceData
