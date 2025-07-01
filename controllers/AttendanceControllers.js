@@ -70,7 +70,7 @@ exports.getAttendanceByDate = async (req, res) => {
   workType2: 'Regular',            
   remarks: '',
   isEditing: false
-}));
+}))||[];
 console.log(start,'start')
       record = await DailyAttendance.create({
         date: start,
