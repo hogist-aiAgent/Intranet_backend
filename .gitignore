@@ -15,7 +15,7 @@ dist-ssr
 *.local
 .env/
 .env
-
+./env
 .vscode/*
 !.vscode/extensions.json
 .idea

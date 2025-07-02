@@ -20,25 +20,7 @@ exports.bulkUpsertAttendance = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
-// exports.getAttendanceByDate = async (req, res) => {
-//   try {
-//     const { date } = req.params;
-//     const start = new Date(date);
 
-
-//     const records = await DailyAttendance.find({
-//       date: start
-//     });
-
-//     res.status(200).json({
-//         status:"Data are got successfully",
-//         data:records
-//     });
-//   } catch (err) {
-//     console.error('Fetch error:', err);
-//     res.status(500).json({ message: 'Internal server error' });
-//   }
-// };
 exports.getAttendanceByDate = async (req, res) => {
   try {
     const { date } = req.params;
@@ -88,3 +70,41 @@ exports.getAttendanceByDate = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+
+exports.deleteEmployeeAttendance = async (req, res) => {
+  try {
+    const { date, empCode } = req.body;
+
+    if (!date || !empCode) {
+      return res.status(400).json({ message: 'date and empCode are required' });
+    }
+
+    const formattedDate = new Date(date);
+
+    const updatedRecord = await DailyAttendance.findOneAndUpdate(
+      { date: formattedDate },
+      { $pull: { attendanceData: { empCode } } },
+      { new: true }
+    );
+
+    if (!updatedRecord) {
+      return res.status(404).json({ message: 'No attendance record found for this date or employee' });
+    }
+
+    return res.status(200).json({
+      message: `Attendance record for ${empCode} on ${date} deleted successfully`,
+      data: updatedRecord
+    });
+
+  } catch (err) {
+    console.error('Delete employee attendance error:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+//http://localhost:7002/api/attendance/delete-employee -patch
+// {
+//   "date": "2025-06-28T00:00:00.000Z",
+//   "empCode": "Emp027"
+// }
