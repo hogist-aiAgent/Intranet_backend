@@ -41,13 +41,13 @@ const staffSchema = new mongoose.Schema({
   },
 
   documents: {
-    offerLetter: Boolean,
-    experienceLetter: Boolean,
-    relievingLetter: Boolean,
-    resume: Boolean,
-    aadhar: Boolean,
-    pan: Boolean,
-    rnr: Boolean,
+    offerLetter: String,
+    experienceLetter: String,
+    relievingLetter: String,
+    resume: String,
+    aadhar: String,
+    pan: String,
+    rnr: String,
   }
 }, { timestamps: true });
 

@@ -3,6 +3,7 @@ const DailyAttendanceSchema = new mongoose.Schema({
   date: { type: Date, required: true, unique: true },
   attendanceData: [
     {
+    staff: { type: mongoose.Schema.Types.ObjectId, ref: 'Staff' },
       empCode: String,
       name: String,
       role: String,

@@ -56,6 +56,7 @@ exports.getAttendanceByDate = async (req, res) => {
      
       const staffList = await Staff.find({}, 'employeeId staffName role department jobType');
      const attendanceData = staffList.map((emp) => ({
+       staff: emp.staff,
   empCode: emp.employeeId,
   name: emp.staffName,
   role: emp.role,
@@ -71,7 +72,7 @@ exports.getAttendanceByDate = async (req, res) => {
   remarks: '',
   isEditing: false
 }))||[];
-console.log(start,'start')
+
       record = await DailyAttendance.create({
         date: start,
         attendanceData
