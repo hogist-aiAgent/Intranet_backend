@@ -30,16 +30,23 @@ const dateOnly = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.
       isEditing: false
     };
     let dailyAttendance = await DailyAttendance.findOne({ date: dateOnly });
-    if (!dailyAttendance) {
-      // create new attendance document
-      dailyAttendance = new DailyAttendance({
-        date: dateOnly,
-        attendanceData: [attendanceEntry]
-      });
-    } else {
+    
+   if (!dailyAttendance) {
+  // create new attendance document
+  dailyAttendance = new DailyAttendance({
+    date: dateOnly,
+    attendanceData: [{
+      ...attendanceEntry,
+      dept: Array.isArray(attendanceEntry.department) ? attendanceEntry.department.join(', ') : attendanceEntry.department
+    }]
+  });
+} else {
+  dailyAttendance.attendanceData.push({
+    ...attendanceEntry,
+    dept: Array.isArray(attendanceEntry.department) ? attendanceEntry.department.join(', ') : attendanceEntry.department
+  });
+}
 
-      dailyAttendance.attendanceData.push(attendanceEntry);
-    }
 
     await dailyAttendance.save();
 
