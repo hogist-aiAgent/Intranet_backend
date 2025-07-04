@@ -37,13 +37,13 @@ const dateOnly = new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.
     date: dateOnly,
     attendanceData: [{
       ...attendanceEntry,
-      dept: Array.isArray(attendanceEntry.department) ? attendanceEntry.department.join(', ') : attendanceEntry.department
+      dept: Array.isArray(attendanceEntry.dept) ? attendanceEntry.dept.join(', ') : attendanceEntry.dept
     }]
   });
 } else {
   dailyAttendance.attendanceData.push({
     ...attendanceEntry,
-    dept: Array.isArray(attendanceEntry.department) ? attendanceEntry.department.join(', ') : attendanceEntry.department
+    dept: Array.isArray(attendanceEntry.dept) ? attendanceEntry.dept.join(', ') : attendanceEntry.dept
   });
 }
 
