@@ -67,7 +67,26 @@ exports.getStaffById = async (req, res) => {
   try {
     const staff = await Staff.findById(req.params.id);
     if (!staff) return res.status(404).json({ error: 'Staff not found' });
-    res.json(staff);
+    res.json({
+      message:"Successfully",
+      data:staff
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+exports.getStaffByEmail = async (req, res) => {
+const {email}=req.body
+
+  try {
+    const staff = await Staff.findOne({email});
+    if (!staff) return res.status(404).json({ error: 'Staff not found' });
+    res.json({
+      message:"Successfully",
+      data:staff
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

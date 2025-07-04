@@ -38,4 +38,37 @@ console.log(fileUrl)
   }
 };
 
-module.exports = { uploadPdf };
+const uploadImage = async (req, res) => {
+  try {
+    const file = req.file;
+    if (!file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    if (!file.mimetype.startsWith('image/')) {
+      return res.status(400).json({ message: 'Only image files allowed' });
+    }
+
+    const fileKey = `${crypto.randomBytes(16).toString('hex')}${path.extname(file.originalname)}`;
+
+    const uploadParams = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: fileKey,
+      Body: file.buffer,
+      ContentType: file.mimetype,
+    };
+
+    await s3.send(new PutObjectCommand(uploadParams));
+
+    const fileUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileKey}`;
+    console.log('Image uploaded to:', fileUrl);
+    res.json({ url: fileUrl });
+
+  } catch (err) {
+    console.error('Image upload failed:', err);
+    res.status(500).json({ message: 'Failed to upload file' });
+  }
+};
+
+
+module.exports = { uploadPdf,uploadImage };

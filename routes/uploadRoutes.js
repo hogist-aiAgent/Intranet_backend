@@ -1,6 +1,6 @@
 const multer = require('multer');
 const express = require('express');
-const { uploadPdf } = require('../controllers/uploadControllers'); // CommonJS require
+const { uploadPdf,uploadImage } = require('../controllers/uploadControllers'); 
 const router = express.Router();
 
 const storage = multer.memoryStorage();
@@ -16,6 +16,7 @@ const upload = multer({
 });
 
 
-router.post('/upload', upload.single('file'), uploadPdf);
+router.post('/upload/pdf', upload.single('file'), uploadPdf);
+router.post('/upload/image', upload.single('file'), uploadImage);
 
 module.exports = router; 
