@@ -71,6 +71,97 @@ exports.getAttendanceByDate = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+exports.getMonthlyAttendanceSummaryCustom = async (req, res) => {
+  try {
+    const { empCode, monthName, year, gender } = req.body;
+
+    if (!empCode || !monthName || !year || !gender) {
+      return res.status(400).json({ message: 'empCode, monthName, year and gender are required in body' });
+    }
+
+    const monthMap = {
+      january: 0, february: 1, march: 2, april: 3, may: 4, june: 5,
+      july: 6, august: 7, september: 8, october: 9, november: 10, december: 11
+    };
+
+    const currentMonthNumber = monthMap[monthName.toLowerCase()];
+    if (currentMonthNumber === undefined) {
+      return res.status(400).json({ message: 'Invalid month name provided' });
+    }
+
+    let startMonth = currentMonthNumber - 1;
+    let startYear = year;
+
+    if (startMonth < 0) {
+      startMonth = 11;
+      startYear = year - 1;
+    }
+
+    const startDate = new Date(startYear, startMonth, 28, 0, 0, 0);
+    const endDate = new Date(year, currentMonthNumber, 27, 23, 59, 59);
+
+    const records = await DailyAttendance.find({
+      date: {
+        $gte: startDate,
+        $lte: endDate
+      },
+      "attendanceData.empCode": empCode
+    });
+
+    let presentDays = 0;
+    let absentDays = 0;
+    let clTaken = 0;
+    let lopTaken = 0;
+    let mlTaken = 0;
+
+    records.forEach(day => {
+      const employeeRecord = day.attendanceData.find(a => a.empCode === empCode);
+      if (employeeRecord) {
+        if (employeeRecord.status === 'Present') {
+          presentDays++;
+        }
+        if (employeeRecord.leaveType === 'CL') {
+          clTaken++;
+        }
+        if (employeeRecord.leaveType === 'LOP') {
+          lopTaken++;
+        }
+        if (employeeRecord.leaveType === 'ML') {
+          mlTaken++;
+        }
+        if (employeeRecord.status === 'Leave') {
+          absentDays++;
+        }
+      }
+    });
+
+    const clBalance = Math.max(1 - clTaken, 0);
+    const mlBalance = gender.toLowerCase() === 'female' ? Math.max(1 - mlTaken, 0) : 0;
+
+    return res.status(200).json({
+      empCode,
+      gender,
+      month: monthName,
+      year,
+   cycle: `${startDate.getFullYear()}-${String(startDate.getMonth()+1).padStart(2,'0')}-${String(startDate.getDate()).padStart(2,'0')} to ${endDate.getFullYear()}-${String(endDate.getMonth()+1).padStart(2,'0')}-${String(endDate.getDate()).padStart(2,'0')}`
+,
+      summary: {
+        presentDays,
+        absentDays,
+        clTaken,
+        clBalance,
+        lopTaken,
+        mlTaken,
+        mlBalance
+      }
+    });
+
+  } catch (err) {
+    console.error('Get monthly attendance summary error:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 
 
 exports.deleteEmployeeAttendance = async (req, res) => {
