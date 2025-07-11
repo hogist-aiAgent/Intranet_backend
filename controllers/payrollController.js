@@ -1,30 +1,46 @@
 const Payroll = require('../models/Payroll');
 const Staff = require('../models/Staff');
 
-// CREATE
 exports.createPayroll = async (req, res) => {
   try {
-    const { employeeId, month, year, payslipPdfUrl } = req.body;
+    const { employeeId, month, year, payslipPdfUrl, staffName } = req.body;
 
+    // Find employee _id by employeeId
     const employee = await Staff.findOne({ employeeId });
     if (!employee) {
       return res.status(404).json({ error: "Employee not found" });
     }
 
-    const payroll = new Payroll({
-      employee: employee['_id'],
+    // Check if payroll for this employee + month + year already exists
+    const existingPayroll = await Payroll.findOne({
+      employee: employee._id,
       month,
       year,
-      payslipPdfUrl
+    });
+
+    if (existingPayroll) {
+      return res.status(400).json({ error: `Payroll for month "${month}" and year "${year}" already exists for this employee.` });
+    }
+
+    // Create new payroll
+    const payroll = new Payroll({
+      employee: employee._id,
+      month,
+      year,
+      payslipPdfUrl,
+      uploadedAt: new Date(),
+      staffName // optional if you want to store it separately
     });
 
     await payroll.save();
-    return res.json({ success: true, payroll });
+
+    res.status(201).json(payroll);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 };
+
 
 // READ all
 exports.getAllPayrolls = async (req, res) => {
@@ -53,12 +69,25 @@ exports.getPayrollsByEmployeeId = async (req, res) => {
       .populate('employee', 'employeeId staffName')
       .sort({ uploadedAt: -1 });
 
-    res.json(payrolls);
+    // Flatten the employee object into each payroll entry
+    const flattenedPayrolls = payrolls.map((payroll) => ({
+      _id: payroll._id,
+      employeeId: payroll.employee?.employeeId || '',
+      staffName: payroll.employee?.staffName || '',
+      month: payroll.month,
+      year: payroll.year,
+      payslipPdfUrl: payroll.payslipPdfUrl,
+      uploadedAt: payroll.uploadedAt,
+      __v: payroll.__v
+    }));
+
+    res.json(flattenedPayrolls);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 };
+
 
 // UPDATE
 exports.updatePayroll = async (req, res) => {

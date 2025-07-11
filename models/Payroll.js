@@ -8,8 +8,8 @@ const PayrollSchema = new Schema({
     required: true
   },
   month: { type: String, required: true },
-  year: { type: Number, required: true },
-  payslipPdfUrl: { type: String, required: true }, // renamed field
+  year: { type: Number, required  : true },
+  payslipPdfUrl: { type: String, required: true }, 
   uploadedAt: { type: Date, default: Date.now }
 });
 
