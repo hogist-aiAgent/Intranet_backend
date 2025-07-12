@@ -20,7 +20,6 @@ exports.bulkUpsertAttendance = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
-
 exports.getAttendanceByDate = async (req, res) => {
   try {
     const { date } = req.params;
@@ -161,9 +160,6 @@ exports.getMonthlyAttendanceSummaryCustom = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
-
-
-
 exports.deleteEmployeeAttendance = async (req, res) => {
   try {
     const { date, empCode } = req.body;
@@ -195,7 +191,57 @@ exports.deleteEmployeeAttendance = async (req, res) => {
   }
 };
 
-//http://localhost:7002/api/attendance/delete-employee -patch
+exports.getAttendanceByEmployeeId = async (req, res) => {
+  try {
+    const { empCode, month, year } = req.body;
+
+    if (!empCode || !month || !year) {
+      return res.status(400).json({ message: 'empCode, month, and year are required' });
+    }
+
+    const monthNum = parseInt(month, 10) - 1; // JS months are 0-based
+    const startDate = new Date(year, monthNum, 1);
+    const endDate = new Date(year, monthNum + 1, 0, 23, 59, 59); // end of the month
+
+    const records = await DailyAttendance.find({
+      date: { $gte: startDate, $lte: endDate },
+      "attendanceData.empCode": empCode
+    });
+
+    const attendance = records.map((record) => {
+      const emp = record.attendanceData.find(e => e.empCode === empCode);
+
+      return {
+        date: record.date.toISOString().split("T")[0],
+        status: emp.status,
+        loginTime: emp.loginTime,
+        logoutTime: emp.logoutTime,
+        totalWorkHrs: emp.totalWorkHrs,
+        onOffSite: emp.onOffSite,
+        leaveType: emp.leaveType,
+        workType1: emp.workType1,
+        workType2: emp.workType2,
+        remarks: emp.remarks
+      };
+    });
+
+    return res.status(200).json({
+      status: "Success",
+      empCode,
+      month,
+      year,
+      totalDays: attendance.length,
+      attendance
+    });
+
+  } catch (err) {
+    console.error("Get attendance by employee error:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+// http://localhost:7002/api/attendance/delete-employee -patch
 // {
 //   "date": "2025-06-28T00:00:00.000Z",
 //   "empCode": "Emp027"

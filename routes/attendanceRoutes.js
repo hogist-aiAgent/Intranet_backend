@@ -10,4 +10,5 @@ router.patch('/delete-employee', attendanceController.deleteEmployeeAttendance);
  
 router.post('/monthly-summary-custom', attendanceController.getMonthlyAttendanceSummaryCustom);
 
+router.post('/getUserAttendace',attendanceController.getAttendanceByEmployeeId)
 module.exports = router;
